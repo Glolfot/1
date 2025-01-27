@@ -22,25 +22,45 @@
 <div id="user-list">   
 </div>
 <script>
-    const users = [];
+  <script>
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+
+            if (tabId === 'viewUsers') {
+                displayUsers();
+            }
+        });
+    });
+
     document.getElementById('addUserButton').addEventListener('click', function() {
         const name = document.getElementById('name').value;
         const dob = document.getElementById('dob').value;
         const avatarInput = document.getElementById('avatar');
         const avatarFile = avatarInput.files[0];
+
         if (name && dob && avatarFile) {
             const reader = new FileReader();
             reader.onload = function(event) {
                 const user = { name, dob, avatar: event.target.result };
                 users.push(user);
-                displayUsers();
+                localStorage.setItem('users', JSON.stringify(users)); 
+                clearInputs();
             };
             reader.readAsDataURL(avatarFile);
-            clearInputs();
         } else {
             alert('Пожалуйста, заполните все поля.');
         }
     });
+
     function displayUsers() {
         const userList = document.getElementById('user-list');
         userList.innerHTML = ''; 
@@ -52,11 +72,13 @@
             userList.appendChild(userDiv);
         });
     }
+
     function clearInputs() {
         document.getElementById('name').value = '';
         document.getElementById('dob').value = '';
         document.getElementById('avatar').value = '';
     }
 </script>
+
 </body>
 </html>
